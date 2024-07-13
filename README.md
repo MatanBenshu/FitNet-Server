@@ -1,41 +1,40 @@
 
-# FitNet
+## FitNet-Project Overview
 
-FitNet is a social network for athletes and sports lovers to connect, share, and engage in sports activities together. Whether you're looking to find a workout partner, join sports events, or share your fitness journey, FitNet is the place for you!
+This project aims to develop a comprehensive social network for fitness and training enthusiasts. It includes functionalities for user registration, membership management, home page interactions, personal profile management, and various social networking features such as liking, sharing, and following content.
 
 ## Features
 
-- User authentication (login and registration)
-- User profile management
-- Post creation and interaction
-- View and search for other users
-- Responsive design
-- Gender and address fields for user profiles
+### User Registration and Membership
+- **Registration**: Sign up with email, password, and additional personal information.
+- **Membership Management**: Edit personal details, delete accounts, change passwords, manage followers, upload content, and view statistical information.
 
-  User Registration and Membership:
+### Home Page Functionalities
+- **Content Interaction**: Post, like, share, and save content.
+- **Social Networking**: Follow other users and view their activities.
 
-Registration: 
-Users can sign up with their email and password, along with additional personal information.
+### Personal Area
+- Edit personal details.
+- Delete accounts.
+- Change passwords.
+- Manage followers.
+- Upload content.
+- View liked and saved content.
+- Access statistical information.
 
-Membership Management:
- Users can edit personal details, delete accounts, change passwords, manage followers, upload content, and view statistical information.
-
-Home Page Functionalities:
-Users can access and interact with content, including posting, liking, sharing, and saving content.
-Users can follow other users and view their activities.
-
-Personal Area:
-Users have access to features such as editing personal details, deleting accounts, changing passwords, managing followers, uploaded content, liked content, saved content, and viewing statistical information.
-
-Additional Features:
-
-Sports Activity Events: 
-Users can upload and join sports activities.
-Weather Conditions: Users can check weather conditions relevant to their activities.
+### Additional Features
+- **Sports Activity Events**: Upload and join sports activities.
+- **Weather Conditions**: Check relevant weather conditions.
+- **Training Groups**: Create and join training groups.
 
 
-Training Groups: 
-Users can create and join training groups.
+## Project Management
+- The project is organized into sprints, with tasks assigned to specific sprints for completion.
+- Tasks are tracked through their lifecycle, from creation to completion.
+
+## Summary
+
+The fitness and training social network project is designed to provide a robust platform where fitness enthusiasts can connect, share content, and engage in various activities. The detailed tasks and user stories ensure meticulous planning and tracking, facilitating successful implementation of each feature.
 
 
 ## Technologies Used
