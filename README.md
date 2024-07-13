@@ -1,4 +1,3 @@
-# FitNet
 
 # FitNet
 
