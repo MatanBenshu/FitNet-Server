@@ -21,7 +21,7 @@ FitNet is a social network for athletes and sports lovers to connect, share, and
 ## Project Structure
 
 
-Contact
+##Contact
 
 Email: Matanbe7@ac.sce.ac.il
 GitHub: MatanBenshu
