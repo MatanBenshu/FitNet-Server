@@ -6,20 +6,20 @@ This project aims to develop a comprehensive social network for fitness and trai
 ## Features
 
 ### User Registration and Membership
-- **Registration**: Sign up with email, password, and additional personal information.
-- **Membership Management**: Edit personal details, delete accounts, change passwords, manage followers, upload content, and view statistical information.
+- **Registration**: Sign up with username(mandatory), email(mandatory), password(mandatory), and additional personal information(optional).
+- **Membership**: Sign in with registered email address and password.
 
 ### Home Page Functionalities
-- **Content Interaction**: Post, like, share, and save content.
+- **Content Interaction**: Post, like, share and save content.
 - **Social Networking**: Follow other users and view their activities.
 
 ### Personal Area
 - Edit personal details.
 - Delete accounts.
 - Change passwords.
-- Manage followers.
-- Upload content.
-- View liked and saved content.
+- View and manage followed users.
+- View and manage uploaded content.
+- View and manage liked and saved content.
 - Access statistical information.
 
 ### Additional Features
