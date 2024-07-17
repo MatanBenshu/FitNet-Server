@@ -6,7 +6,7 @@ export default [
   rules:{
     indent:['error',4],
     quotes: ['error','single'],
-    quotes: ['error','always'],
+    semi: ['error','always'],
     }},
   
 ];
