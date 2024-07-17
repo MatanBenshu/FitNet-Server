@@ -32,4 +32,4 @@ jobs:
           command: npm run lint
       - run:
           name: deploy app
-          command: curl "https://api.render.com/deploy/srv-cps4h8d6l47c73dvolh0?key=352YlvH5HmM"
+          command: curl "https://api.render.com/deploy/srv-cqc37tjv2p9s73fg1hl0?key=JiC9HIVqvwM"
