@@ -25,7 +25,7 @@ jobs:
           name: install app dependencies
           command: npm install
       - run:
-          name: ren tests
+          name: run tests
           command: npm run test
       - run:
           name: run linter
