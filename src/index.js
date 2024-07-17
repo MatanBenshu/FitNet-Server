@@ -1,0 +1,1 @@
+console.log('fitNet web site');
