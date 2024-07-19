@@ -40,7 +40,7 @@ jobs:
           name: deploy app
           environment:
             RENDER_HOOK: RENDER_HOOK
-          command: curl RENDER_HOOK
+          command: curl $RENDER_HOOK
   deploy:
     executor: node/default
     steps:
