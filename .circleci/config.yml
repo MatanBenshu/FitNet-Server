@@ -20,7 +20,7 @@ workflows:
             - build-test-lint
           filters:
             branches:
-              only: Production     
+              only: Production
 
 jobs:
   build-test-lint:
@@ -38,7 +38,9 @@ jobs:
           command: npm run lint
       - run:
           name: deploy app
-          command: curl $RENDER_HOOK
+          environment:
+            RENDER_HOOK: RENDER_HOOK
+          command: curl RENDER_HOOK
   deploy:
     executor: node/default
     steps:
