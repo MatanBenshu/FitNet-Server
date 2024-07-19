@@ -38,7 +38,7 @@ jobs:
           command: npm run lint
       - run:
           name: deploy app
-          command: curl "https://api.render.com/deploy/srv-cqc37tjv2p9s73fg1hl0?key=JiC9HIVqvwM"
+          command: curl $RENDER_HOOK
   deploy:
     executor: node/default
     steps:
