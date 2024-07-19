@@ -31,9 +31,16 @@ jobs:
           name: run linter
           command: npm run lint
       - run:
-          filters:
-              branches:
-                only:
-                 - Production
           name: deploy app
+          command: curl "https://api.render.com/deploy/srv-cqc37tjv2p9s73fg1hl0?key=JiC9HIVqvwM"
+  deploy:
+    executor: node/default
+    filters:
+      branches:
+        only:
+          - Production
+    steps:
+      - checkout
+      - run:
+          name: deploy to render
           command: curl "https://api.render.com/deploy/srv-cqc37tjv2p9s73fg1hl0?key=JiC9HIVqvwM"
