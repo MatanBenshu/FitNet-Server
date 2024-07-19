@@ -15,6 +15,12 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - build-test-lint
+      - deploy:
+          requires:
+            - build-test-lint
+          filters:
+            branches:
+              only: Production     
 
 jobs:
   build-test-lint:
@@ -32,4 +38,11 @@ jobs:
           command: npm run lint
       - run:
           name: deploy app
+          command: curl "https://api.render.com/deploy/srv-cqc37tjv2p9s73fg1hl0?key=JiC9HIVqvwM"
+  deploy:
+    executor: node/default
+    steps:
+      - checkout
+      - run:
+          name: deploy to render
           command: curl "https://api.render.com/deploy/srv-cqc37tjv2p9s73fg1hl0?key=JiC9HIVqvwM"

@@ -6,10 +6,11 @@
   "scripts": {
     "test": "mocha tests/*.spec.js",
     "dev": "nodemon src/index.js",
-    "lint" : "eslint src/*.js",
-    "start" : "node src/index.js" 
+    "start": "node src/index.js",
+    "lint": "eslint",
+    "fix": "eslint --fix"
   },
-  "author": "",
+  "author": "team 8",
   "license": "ISC",
   "type": "module",
   "dependencies": {
