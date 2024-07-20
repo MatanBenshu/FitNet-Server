@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import contentsRouts from './routes/contents.js';
+import authRouts from './routes/auth.js';
 const app = express();
 
 const dbURI =
@@ -16,9 +17,9 @@ mongoose
 
 app.use(cors());
 app.use(bodyParser.json());
-
+app.use('', authRouts);
 app.use('/contents', contentsRouts);
-
+app.use('/auth', authRoutes);
 const PORT = process.env.PORT || 5000;
 const fun = () => console.log(`Server running on port ${PORT}`);
 app.listen(PORT, fun);
