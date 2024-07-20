@@ -19,7 +19,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use('', authRouts);
 app.use('/contents', contentsRouts);
-app.use('/auth', authRoutes);
+app.use('/auth', authRouts);
 const PORT = process.env.PORT || 5000;
 const fun = () => console.log(`Server running on port ${PORT}`);
 app.listen(PORT, fun);
