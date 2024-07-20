@@ -11,8 +11,7 @@ orbs:
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  fitNet_ci: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  fitNet_ci:
     jobs:
       - build-test-lint
       - deploy:
@@ -20,7 +19,7 @@ workflows:
             - build-test-lint
           filters:
             branches:
-              only: Production     
+              only: Production
 
 jobs:
   build-test-lint:
@@ -36,9 +35,7 @@ jobs:
       - run:
           name: run linter
           command: npm run lint
-      - run:
-          name: deploy app
-          command: curl "https://api.render.com/deploy/srv-cqc37tjv2p9s73fg1hl0?key=JiC9HIVqvwM"
+
   deploy:
     executor: node/default
     steps:
