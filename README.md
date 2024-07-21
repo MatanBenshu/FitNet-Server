@@ -3,6 +3,10 @@
 
 This project aims to develop a comprehensive social network for fitness and training enthusiasts. It includes functionalities for user registration, membership management, home page interactions, personal profile management, and various social networking features such as liking, sharing, and following content.
 
+### Links:
+1. FrontEnd: https://fitnet-client.onrender.com
+2. BackEnd: https://fitnet-server-1.onrender.com
+
 ## Features
 
 ### User Registration and Membership
@@ -43,10 +47,37 @@ The fitness and training social network project is designed to provide a robust 
 - Backend: Node.js, Express.js, MongoDB, Mongoose
 - Styling: CSS
 
-## Project Structure
+## System Requirements
 
+To run this project, you will need to have the following software and hardware:
+
+### Software Requirements
+
+- **Node.js**: Version 14.x or higher
+- **NPM (Node Package Manager)**: Version 6.x or higher
+- **MongoDB**: Version 4.x or higher (MongoDB Atlas recommended for cloud-based MongoDB)
+- **Operating System**: Compatible with Windows, macOS, and Linux
+- **Git**: Version control system to clone the repository
+
+## Getting Started
+
+### Prerequisites
+
+- Ensure Node.js and npm are installed. You can download and install them from [Node.js official website](https://nodejs.org/).
+- Ensure MongoDB is installed. You can download and install it from [MongoDB official website](https://www.mongodb.com/try/download/community). Alternatively, you can use MongoDB Atlas for a cloud-hosted MongoDB solution.
+- Ensure Git is installed. You can download and install it from [Git official website](https://git-scm.com/).
+
+### Installation
+1. Clone the repository
+2. Navigate to the project directory and open cmd
+3. Install dependencies , run the command 'npm install'
+
+
+## Running the Application
+- Start the server with the command 'npm run start'
 
 ## Contact
+
 
 - Email: Matanbe7@ac.sce.ac.il
 - GitHub: MatanBenshu
