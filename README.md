@@ -3,6 +3,10 @@
 
 This project aims to develop a comprehensive social network for fitness and training enthusiasts. It includes functionalities for user registration, membership management, home page interactions, personal profile management, and various social networking features such as liking, sharing, and following content.
 
+### Links:
+1. FrontEnd: https://fitnet-client.onrender.com
+2. BackEnd: https://fitnet-server-1.onrender.com
+
 ## Features
 
 ### User Registration and Membership
