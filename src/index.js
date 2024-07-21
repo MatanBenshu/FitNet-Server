@@ -20,7 +20,7 @@ mongoose
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/about', aboutRouts);
-app.use('/contents', contentsRouts);
+app.use('/contents' ,contentsRouts);
 app.use('/auth', authRouts);
 app.use('/ping', pingRouts);
 const PORT = process.env.PORT || 5000;
