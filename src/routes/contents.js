@@ -8,7 +8,7 @@ router.get('/:id', async (req, res) => {
         if (!aboutContent) {
             return res
                 .status(404)
-                .json({ success: false, message: 'Content not found' });
+                .send({ success: false, message: 'Content not found' });
         }
 
         res.status(200).json({ success: true, user: aboutContent });
