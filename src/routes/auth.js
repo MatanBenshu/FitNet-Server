@@ -2,6 +2,9 @@ import express from 'express';
 const router = express.Router();
 import User from '../models/User.js';
 
+import jwt from 'jsonwebtoken';
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+
 router.post('/register', async (req, res) => {
     const {
         username,
@@ -26,10 +29,10 @@ router.post('/register', async (req, res) => {
         });
         await newUser.save();
         const user = await User.findOne({ email });
-
+        const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
         res
             .status(200)
-            .json({ success: true, message: 'User registered successfully', user });
+            .json({ success: true, message: 'User registered successfully', user ,token});
     } catch (error) {
         res
             .status(500)
@@ -53,8 +56,8 @@ router.post('/login', async (req, res) => {
                 .status(400)
                 .json({ success: false, message: 'Invalid email or password' });
         }
-
-        res.status(200).json({ success: true, message: 'Login successful', user });
+        const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
+        res.status(200).json({ success: true, message: 'Login successful', user ,token});
     } catch (error) {
         res
             .status(500)
