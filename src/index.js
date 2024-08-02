@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import path from 'path';
-import { fileURLToPath } from 'url';
+//import { fileURLToPath } from 'url';
 import contentsRouts from './routes/contents.js';
 import authRouts from './routes/auth.js';
 import pingRouts from './routes/ping.js';
