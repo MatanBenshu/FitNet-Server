@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import path from 'path';
+import multer from 'multer';
 //import { fileURLToPath } from 'url';
 import contentsRouts from './routes/contents.js';
 import authRouts from './routes/auth.js';
@@ -35,6 +36,28 @@ app.use(bodyParser.json());
 const __dirname = path.resolve();
 //const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
+
+// Multer middleware for handling file uploads.
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, req.body.name);
+    },
+});
+
+const upload = multer({ storage: storage });
+app.post('/upload', upload.single('file'), (req, res) => {
+    try {
+        return res.status(200).json('File uploded successfully');
+    } catch (error) {
+        console.error(error);
+    }
+});
+
+
 
 // Routes
 app.use('/ping', pingRouts);
