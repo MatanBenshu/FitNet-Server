@@ -1,8 +1,10 @@
 import express from 'express';
 const router = express.Router();
+
 import Event from '../models/Event.js';
 import Post from '../models/Post.js';
 import Group from '../models/Group.js';
+import User from '../models/User.js';
 
 //create a group
 
@@ -38,6 +40,47 @@ router.get('/:id', async (req, res) => {
     try {
         const group = await Group.findById(req.params.id);
         res.status(200).json(group);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+//get User groups
+router.get('/all/:userId', async (req, res) => {
+    try {
+        const adminGroups = await Group.find({ Admin: req.params.userId });
+        const followGroups = await Group.find({ followers: req.params.userId , Admin: { $nin: req.params.userId } });
+        const user = await User.findById(req.params.userId);
+
+        let friendsGroup = await Promise.all(
+            user.followings.map((friendId) => {
+                return Group.find({followers:friendId});
+            }));   
+        
+        friendsGroup = friendsGroup.flat();
+        
+        let recommendGroups=[];
+        friendsGroup.map(friendGroup => {
+            if (!adminGroups.includes(friendGroup ) && 
+                !followGroups.includes(friendGroup) &&
+                !recommendGroups.includes(friendGroup)) {
+                recommendGroups.push(friendGroup);
+            }
+        });
+
+        let admin = [];
+        adminGroups.map((group) => {
+            admin.push(group.groupname);
+        });
+        let follow = [];
+        followGroups.map((group) => {
+            follow.push(group.groupname);
+        });
+        let recommend = [];
+        recommendGroups.map((group) => {
+            recommend.push(group.groupname);
+        });
+        res.status(200).json({admin:admin,follow:follow,recommend:recommend});
     } catch (err) {
         res.status(500).json(err);
     }

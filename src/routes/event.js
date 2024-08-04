@@ -7,7 +7,9 @@ import Event from '../models/Event.js';
 //create a event
 
 router.post('/', async (req, res) => {
+    console.log(req.body);
     const newEvent = new Event(req.body);
+    console.log(newEvent);
     try {
         const savedEvent = await newEvent.save();
         res.status(200).json(savedEvent);
@@ -38,6 +40,47 @@ router.get('/:id', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id);
         res.status(200).json(event);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+//get user all events
+router.get('/all/:userId', async (req, res) => {
+    try {
+        const userEvents = await Event.find({ userId: req.params.userId });
+        const followEvents = await Event.find({ attendees: req.params.userId , userId: { $nin: req.params.userId } });
+        const user = await User.findById(req.params.userId);
+
+        let friendsEvents = await Promise.all(
+            user.followings.map((friendId) => {
+                return Event.find({attendees:friendId});
+            }));   
+        
+        friendsEvents = friendsEvents.flat();
+        
+        let recommendEvents=[];
+        friendsEvents.map(event => {
+            if (!userEvents.includes(event ) && 
+                !followEvents.includes(event) &&
+                !recommendEvents.includes(event)) {
+                recommendEvents.push(event);
+            }
+        });
+
+        let own = [];
+        userEvents.map((event) => {
+            own.push(event.title);
+        });
+        let follow = [];
+        followEvents.map((event) => {
+            follow.push(event.title);
+        });
+        let recommend = [];
+        recommendEvents.map((event) => {
+            recommend.push(event.title);
+        });
+        res.status(200).json({own:own,follow:follow,recommend:recommend});
     } catch (err) {
         res.status(500).json(err);
     }
