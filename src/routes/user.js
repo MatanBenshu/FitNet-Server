@@ -4,7 +4,7 @@ import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 
 //update user
-router.put('/:id', async (req, res) => {
+router.post('/:id', async (req, res) => {
     if (req.body.userId === req.params.id ) {
         if (req.body.password) {
             try {
@@ -15,11 +15,11 @@ router.put('/:id', async (req, res) => {
             }
         }
         try {
-            await User.findByIdAndUpdate(req.params.id, {
+            const user = await User.findByIdAndUpdate(req.params.id, {
                 $set: req.body,
             });
             
-            res.status(200).json('Account has been updated');
+            res.status(200).json(user);
         } catch (err) {
             return res.status(500).json(err);
         }
@@ -62,18 +62,22 @@ router.get('/', async (req, res) => {
 router.get('/friends/:userId', async (req, res) => {
     try {
         const user = await User.findById(req.params.userId);
-        const friends = await Promise.all(
-            user.followings.map((friendId) => {
-                return User.findById(friendId);
-            })
-        );
-        console.log(friends);
-        let friendList = [];
-        friends.map((friend) => {
-            const { _id, username, profilePicture } = friend;
-            friendList.push({ _id, username, profilePicture });
-        });
-        res.status(200).json(friendList);
+        if (user.followings.length > 0){
+            const friends = await Promise.all(
+                user.followings.map((friendId) => {
+                    return User.findById(friendId);
+                })
+            );
+            let friendList = [];
+            friends.map((friend) => {
+                const { _id, username, profilePicture } = friend;
+                friendList.push({ _id, username, profilePicture });
+            });
+            res.status(200).json(friendList);
+        }
+        else{
+            res.status(200).json([]);
+        }
     } catch (err) {
         res.status(500).json(err);
     }
