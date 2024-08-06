@@ -122,5 +122,18 @@ router.put('/:id/unfollow', async (req, res) => {
         res.status(403).json('you cant unfollow yourself');
     }
 });
-
+// Search users by username
+router.get('/search', async (req, res) => {
+    const query = req.query.query;
+    console.log('Search query:', query); 
+    try {
+        const users = await User.find({ username: { $regex: query, $options: 'i' } }).select('username');
+        console.log('Users found:', users); 
+        res.status(200).json(users);
+    } catch (err) {
+        console.error('Error searching for users:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 export default router;
+
