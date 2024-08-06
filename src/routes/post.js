@@ -175,7 +175,7 @@ router.get('/profile/:username', async (req, res) => {
 router.get('/likes/:username', async (req, res) => {
     try {
         const user = await User.findOne({ username: req.params.username });
-        const likedPosts = await Post.find({ likes: user._id });
+        const likedPosts = await Post.find({ likes: user._id.toString() });
         res.status(200).json(likedPosts);
     } catch (err) {
         res.status(500).json(err);
@@ -188,7 +188,7 @@ router.get('/likes/:username', async (req, res) => {
 router.get('/saved/:username', async (req, res) => {
     try {
         const user = await User.findOne({ username: req.params.username });
-        const savedPosts = await Post.find({ savedBy: user._id });
+        const savedPosts = await Post.find({ savedBy: user._id.toString() });
         res.status(200).json(savedPosts);
     } catch (err) {
         res.status(500).json(err);

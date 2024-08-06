@@ -1,6 +1,9 @@
 import express from 'express';
 const router = express.Router();
 import User from '../models/User.js';
+import Event from '../models/Event.js';
+import Post from '../models/Post.js';
+import Group from '../models/Group.js';
 import bcrypt from 'bcryptjs';
 
 //update user
@@ -15,9 +18,11 @@ router.post('/:id', async (req, res) => {
             }
         }
         try {
-            const user = await User.findByIdAndUpdate(req.params.id, {
+            await User.findByIdAndUpdate(req.params.id, {
                 $set: req.body,
             });
+            const user = await User.findById(req.params.id);
+            console.log(user);
             
             res.status(200).json(user);
         } catch (err) {
@@ -133,6 +138,29 @@ router.get('/search', async (req, res) => {
     } catch (err) {
         console.error('Error searching for users:', err);
         res.status(500).json({ error: 'Server error' });
+    }
+});
+
+//get user statistic information 
+// number of followers , number of posts , number of events , number of groups
+
+router.get('/statistic/:id', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        const followersCount = user.followings.length;
+        const postsCount = await Post.countDocuments({ userId: req.params.id });
+        const postsLiked = await Post.countDocuments({  likes: req.params.id });
+        const postsSaved = await Post.countDocuments({  savedBy: req.params.id});
+        const eventsCount = await Event.countDocuments({ userId: req.params.id });
+        const eventsJoined = await Event.countDocuments({ attendees: req.params.id, userId: { $nin: req.params.id }});
+        const groupsCount = await Group.countDocuments({ Admin: req.params.id });
+        const groupsJoined = await Group.countDocuments({ followers: req.params.id, Admin: { $nin: req.params.id }});
+        res.status(200).json({ followersCount, 
+            postsCount, postsLiked, postsSaved,
+            eventsCount, eventsJoined,
+            groupsCount, groupsJoined });
+    } catch (err) {
+        res.status(500).json(err);
     }
 });
 export default router;
