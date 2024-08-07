@@ -80,7 +80,7 @@ router.get('/all/:userId', async (req, res) => {
         recommendEvents.map((event) => {
             recommend.push(event.title);
         });
-        res.status(200).json({own:own,follow:follow,recommend:recommend});
+        res.status(200).json({own:userEvents,follow:followEvents,recommend:recommendEvents});
     } catch (err) {
         res.status(500).json(err);
     }
