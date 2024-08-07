@@ -17,7 +17,15 @@ router.post('/', async (req, res) => {
         res.status(500).json(err);
     }
 });
-
+// Route to get all events
+router.get('/all', async (req, res) => {
+    try {
+      const events = await Event.find({});
+      res.json(events);
+    } catch (error) {
+      res.status(500).send('Server Error');
+    }
+  });
 //update a event
 
 router.put('/:id', async (req, res) => {
