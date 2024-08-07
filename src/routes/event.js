@@ -162,5 +162,22 @@ router.get('/suggest/:userId', async (req, res) => {
         res.status(500).json(err);
     }
 });
+// Route to delete an event by ID
+router.delete('/:id', async (req, res) => {
+    try {
+      const event = await Event.findById(req.params.id);
+      if (!event) {
+        return res.status(404).json({ msg: 'Event not found' });
+      }
 
+      if (event.user.toString() !== req.user.id) {
+        return res.status(401).json({ msg: 'User not authorized' });
+      }
+      await event.remove();
+      res.json({ msg: 'Event removed' });
+    } catch (error) {
+      console.error('Server Error', error);
+      res.status(500).send('Server Error');
+    }
+  });
 export default router;
