@@ -20,12 +20,12 @@ router.post('/', async (req, res) => {
 // Route to get all events
 router.get('/all', async (req, res) => {
     try {
-      const events = await Event.find({});
-      res.json(events);
+        const events = await Event.find({});
+        res.json(events);
     } catch (error) {
-      res.status(500).send('Server Error');
+        res.status(500).send(error,'Server Error');
     }
-  });
+});
 //update a event
 
 router.put('/:id', async (req, res) => {
@@ -173,19 +173,19 @@ router.get('/suggest/:userId', async (req, res) => {
 // Route to delete an event by ID
 router.delete('/:id', async (req, res) => {
     try {
-      const event = await Event.findById(req.params.id);
-      if (!event) {
-        return res.status(404).json({ msg: 'Event not found' });
-      }
+        const event = await Event.findById(req.params.id);
+        if (!event) {
+            return res.status(404).json({ msg: 'Event not found' });
+        }
 
-      if (event.user.toString() !== req.user.id) {
-        return res.status(401).json({ msg: 'User not authorized' });
-      }
-      await event.remove();
-      res.json({ msg: 'Event removed' });
+        if (event.user.toString() !== req.user.id) {
+            return res.status(401).json({ msg: 'User not authorized' });
+        }
+        await event.remove();
+        res.json({ msg: 'Event removed' });
     } catch (error) {
-      console.error('Server Error', error);
-      res.status(500).send('Server Error');
+        console.error('Server Error', error);
+        res.status(500).send('Server Error');
     }
-  });
+});
 export default router;
