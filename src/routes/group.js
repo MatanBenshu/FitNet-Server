@@ -54,20 +54,11 @@ router.get('/all/:userId', async (req, res) => {
 
         let friendsGroup = await Promise.all(
             user.followings.map((friendId) => {
-                return Group.find({followers:friendId});
+                return Group.find({Admin: friendId , followers: { $nin: req.params.userId}});
             }));   
         
         friendsGroup = friendsGroup.flat();
         
-        let recommendGroups=[];
-        friendsGroup.map(friendGroup => {
-            if (!adminGroups.includes(friendGroup ) && 
-                !followGroups.includes(friendGroup) &&
-                !recommendGroups.includes(friendGroup)) {
-                recommendGroups.push(friendGroup);
-            }
-        });
-
         let admin = [];
         adminGroups.map((group) => {
             admin.push(group.groupname);
@@ -77,9 +68,10 @@ router.get('/all/:userId', async (req, res) => {
             follow.push(group.groupname);
         });
         let recommend = [];
-        recommendGroups.map((group) => {
+        friendsGroup.map((group) => {
             recommend.push(group.groupname);
         });
+
         res.status(200).json({admin:admin,follow:follow,recommend:recommend});
     } catch (err) {
         res.status(500).json(err);
