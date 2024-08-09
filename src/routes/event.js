@@ -60,34 +60,13 @@ router.get('/all/:userId', async (req, res) => {
         const followEvents = await Event.find({ attendees: req.params.userId , userId: { $nin: req.params.userId } });
         const user = await User.findById(req.params.userId);
 
-        let friendsEvents = await Promise.all(
+        let recommendEvents = await Promise.all(
             user.followings.map((friendId) => {
-                return Event.find({attendees:friendId});
+                return Event.find({userId: { $in: friendId} ,attendees: { $nin: req.params.userId}});
             }));   
         
-        friendsEvents = friendsEvents.flat();
+        recommendEvents = recommendEvents.flat();
         
-        let recommendEvents=[];
-        friendsEvents.map(event => {
-            if (!userEvents.includes(event ) && 
-                !followEvents.includes(event) &&
-                !recommendEvents.includes(event)) {
-                recommendEvents.push(event);
-            }
-        });
-
-        let own = [];
-        userEvents.map((event) => {
-            own.push(event.title);
-        });
-        let follow = [];
-        followEvents.map((event) => {
-            follow.push(event.title);
-        });
-        let recommend = [];
-        recommendEvents.map((event) => {
-            recommend.push(event.title);
-        });
         res.status(200).json({own:userEvents,follow:followEvents,recommend:recommendEvents});
     } catch (err) {
         res.status(500).json(err);
