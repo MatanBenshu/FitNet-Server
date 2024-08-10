@@ -28,12 +28,15 @@ router.get('/all', async (req, res) => {
 });
 //update a event
 
-router.put('/:id', async (req, res) => {
+router.post('/update/:id', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id);
         if (event.userId === req.body.userId) {
-            await post.updateOne({ $set: req.body });
-            res.status(200).json('the event has been updated');
+            await event.updateOne({ $set: req.body });
+            console.log(event);
+            const updatedEvent = await Event.findById(req.params.id);
+            console.log(updatedEvent);
+            res.status(200).json(updatedEvent);
         } else {
             res.status(403).json('you can update only your event');
         }
@@ -66,7 +69,7 @@ router.get('/all/:userId', async (req, res) => {
             }));   
         
         recommendEvents = recommendEvents.flat();
-        
+
         res.status(200).json({own:userEvents,follow:followEvents,recommend:recommendEvents});
     } catch (err) {
         res.status(500).json(err);
@@ -78,12 +81,8 @@ router.get('/all/:userId', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id);
-        if (event.userId === req.body.userId) {
-            await event.deleteOne();
-            res.status(200).json('the event has been deleted');
-        } else {
-            res.status(403).json('you can delete only your event');
-        }
+        await event.deleteOne();
+        res.status(200).json('the event has been deleted');
     } catch (err) {
         res.status(500).json(err);
     }
@@ -149,22 +148,5 @@ router.get('/suggest/:userId', async (req, res) => {
         res.status(500).json(err);
     }
 });
-// Route to delete an event by ID
-router.delete('/:id', async (req, res) => {
-    try {
-        const event = await Event.findById(req.params.id);
-        if (!event) {
-            return res.status(404).json({ msg: 'Event not found' });
-        }
 
-        if (event.user.toString() !== req.user.id) {
-            return res.status(401).json({ msg: 'User not authorized' });
-        }
-        await event.remove();
-        res.json({ msg: 'Event removed' });
-    } catch (error) {
-        console.error('Server Error', error);
-        res.status(500).send('Server Error');
-    }
-});
 export default router;
