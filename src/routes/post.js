@@ -54,7 +54,6 @@ router.get('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-        console.log(post);
         if (post.shared.length > 0) {
             await Post.deleteMany({ _id: { $in: post.shared } })
                 .then(result => {
