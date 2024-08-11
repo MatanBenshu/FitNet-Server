@@ -7,9 +7,7 @@ import Event from '../models/Event.js';
 //create a event
 
 router.post('/', async (req, res) => {
-    console.log(req.body);
     const newEvent = new Event(req.body);
-    console.log(newEvent);
     try {
         const savedEvent = await newEvent.save();
         res.status(200).json(savedEvent);
@@ -33,9 +31,7 @@ router.post('/update/:id', async (req, res) => {
         const event = await Event.findById(req.params.id);
         if (event.userId === req.body.userId) {
             await event.updateOne({ $set: req.body });
-            console.log(event);
             const updatedEvent = await Event.findById(req.params.id);
-            console.log(updatedEvent);
             res.status(200).json(updatedEvent);
         } else {
             res.status(403).json('you can update only your event');

@@ -22,7 +22,6 @@ router.post('/:id', async (req, res) => {
                 $set: req.body,
             });
             const user = await User.findById(req.params.id);
-            console.log(user);
             
             res.status(200).json(user);
         } catch (err) {
@@ -50,13 +49,11 @@ router.delete('/:id', async (req, res) => {
 //get a user
 router.get('/', async (req, res) => {
     const userId = req.query.userId;
-    console.log(userId);
     const username = req.query.username;
     try {
         const user = userId
             ? await User.findById(userId)
             : await User.findOne({ username: username });
-        console.log(user);   
         // eslint-disable-next-line no-unused-vars
         const { password, updatedAt, ...other } = user._doc;
         res.status(200).json(other);
@@ -132,10 +129,8 @@ router.put('/:id/unfollow', async (req, res) => {
 // Search users by username
 router.get('/search', async (req, res) => {
     const query = req.query.query;
-    console.log('Search query:', query); 
     try {
         const users = await User.find({ username: { $regex: query, $options: 'i' } }).select('username');
-        console.log('Users found:', users); 
         res.status(200).json(users);
     } catch (err) {
         console.error('Error searching for users:', err);

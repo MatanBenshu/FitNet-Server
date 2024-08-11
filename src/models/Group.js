@@ -11,15 +11,21 @@ const GroupSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        type: {
+            type: String,
+            required: true,
+        },
         followers: {
             type: Array,
             default: function() {
                 return [this.Admin];
             },
         },
+        waiting: {
+            type: Array,
+        },
         desc: {
             type: String,
-            max: 50,
         },
     },
     { timestamps: true }
