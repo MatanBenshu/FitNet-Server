@@ -5,6 +5,7 @@ import Event from '../models/Event.js';
 import Post from '../models/Post.js';
 import Group from '../models/Group.js';
 import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 
 //update user
 router.post('/:id', async (req, res) => {
@@ -34,15 +35,47 @@ router.post('/:id', async (req, res) => {
 
 //delete user
 router.delete('/:id', async (req, res) => {
-    if (req.body.userId === req.params.id ) {
-        try {
-            await User.findByIdAndDelete(req.params.id);
-            res.status(200).json('Account has been deleted');
-        } catch (err) {
-            return res.status(500).json(err);
+    const session = await mongoose.startSession();
+    try {
+        session.startTransaction();
+        if (req.query.userId === req.params.id) {
+            // מחיקת המשתמש
+            await User.findByIdAndDelete(req.params.id, { session });
+
+            // מחיקת כל הפוסטים של המשתמש
+            await Post.deleteMany({ userId: req.params.id }, { session });
+
+            // מחיקת המשתמש מרשימות עוקבים של אחרים
+            await User.updateMany(
+                { followers: req.params.id },
+                { $pull: { followers: req.params.id } },
+                { session }
+            );
+
+            // מחיקת המשתמש מקבוצות
+            await Group.updateMany(
+                { members: req.params.id },
+                { $pull: { members: req.params.id } },
+                { session }
+            );
+            // מחיקת השתתפות המשתמש באירועים
+            await Event.updateMany(
+                { attendees: req.params.id },
+                { $pull: { attendees: req.params.id } },
+                { session }
+            );
+
+            await session.commitTransaction();
+            res.status(200).json('Account and all related data have been deleted');
+        } else {
+            await session.abortTransaction();
+            res.status(403).json('You can delete only your account!');
         }
-    } else {
-        return res.status(403).json('You can delete only your account!');
+    } catch (err) {
+        await session.abortTransaction();
+        res.status(500).json(err);
+    } finally {
+        session.endSession();
     }
 });
 
