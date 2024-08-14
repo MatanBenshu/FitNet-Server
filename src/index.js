@@ -2,7 +2,7 @@
 // Import required modules.
 import express from 'express';
 import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
+//import bodyParser from 'body-parser';
 import cors from 'cors';
 import path from 'path';
 import multer from 'multer';
@@ -30,7 +30,8 @@ mongoose
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
+//app.use(bodyParser.json());
+app.use(express.json());
 
 // Serve images from the public/images directory.
 const __dirname = path.resolve();
