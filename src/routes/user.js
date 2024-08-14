@@ -10,14 +10,6 @@ import mongoose from 'mongoose';
 //update user
 router.post('/:id', async (req, res) => {
     if (req.body.userId === req.params.id ) {
-        if (req.body.password) {
-            try {
-                const salt = await bcrypt.genSalt(10);
-                req.body.password = await bcrypt.hash(req.body.password, salt);
-            } catch (err) {
-                return res.status(500).json(err);
-            }
-        }
         try {
             await User.findByIdAndUpdate(req.params.id, {
                 $set: req.body,
@@ -33,51 +25,138 @@ router.post('/:id', async (req, res) => {
     }
 });
 
-//delete user
-router.delete('/:id', async (req, res) => {
-    const session = await mongoose.startSession();
+// update user password
+
+router.post('/change-password/:id', async (req, res) => {
     try {
-        session.startTransaction();
-        if (req.query.userId === req.params.id) {
-            // מחיקת המשתמש
-            await User.findByIdAndDelete(req.params.id, { session });
-
-            // מחיקת כל הפוסטים של המשתמש
-            await Post.deleteMany({ userId: req.params.id }, { session });
-
-            // מחיקת המשתמש מרשימות עוקבים של אחרים
-            await User.updateMany(
-                { followers: req.params.id },
-                { $pull: { followers: req.params.id } },
-                { session }
-            );
-
-            // מחיקת המשתמש מקבוצות
-            await Group.updateMany(
-                { members: req.params.id },
-                { $pull: { members: req.params.id } },
-                { session }
-            );
-            // מחיקת השתתפות המשתמש באירועים
-            await Event.updateMany(
-                { attendees: req.params.id },
-                { $pull: { attendees: req.params.id } },
-                { session }
-            );
-
-            await session.commitTransaction();
-            res.status(200).json('Account and all related data have been deleted');
-        } else {
-            await session.abortTransaction();
-            res.status(403).json('You can delete only your account!');
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.params.id);
+        const isMatch = await user.comparePassword(currentPassword);
+        if (!isMatch) {
+            return res.status(403).json('Invalid password' );
         }
+        else{
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(newPassword, salt);
+            await User.findByIdAndUpdate(req.params.id, { password: hashedPassword });
+            const updatedUser = await User.findById(req.params.id); 
+            res.status(200).json(updatedUser);
+        }
+    }catch(err){
+        res.status(500).json(err);
+    }
+
+
+
+});
+
+// delete user 
+router.delete('/:id', async (req, res) => {
+
+    const { id } = req.params;
+    const { password } = req.body;
+    console.log(password);
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+
+        const user = await User.findById(id).session(session);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            throw new Error('Invalid password');
+        }
+
+        const groupsWhereUserIsAdmin = await Group.find({ Admin: id }).session(session);
+        const groupIdsWhereUserIsAdmin = groupsWhereUserIsAdmin.map(group => group._id);
+
+        const groupsWhereUserIsNotAdmin = await Group.find({
+            _id: { $nin: groupIdsWhereUserIsAdmin },
+            $or: [
+                { followers: id },
+                { waiting: id }
+            ]
+        }).session(session);
+
+        const updateGroupPromises = groupsWhereUserIsNotAdmin.map(group =>
+            Group.updateMany(
+                { _id: group._id },
+                { $pull: { followers: id, waiting: id } },
+                { session }
+            )
+        );
+        
+        const deleteGroupPromises = groupsWhereUserIsAdmin.map(group =>
+            Group.deleteOne({ _id: group._id }).session(session)
+        );
+
+        await Promise.all([...updateGroupPromises, ...deleteGroupPromises]);
+
+        await Post.deleteMany({ group: { $in: groupIdsWhereUserIsAdmin } }).session(session);
+
+        await Event.deleteMany({ userId: id }).session(session);
+
+        await Event.updateMany(
+            { attendees: id }, 
+            { $pull: { attendees: id } }, 
+            { session }
+        );
+
+        const userPosts = await Post.find({ userId: id }).session(session); 
+
+        const userPostIds = userPosts.map(post => post._id); 
+
+        await Promise.all([
+            Post.updateMany(
+                { likes: id },
+                { $pull: { likes: id } },
+                { session }
+            ),
+            Post.updateMany(
+                { savedBy: id },
+                { $pull: { savedBy: id } },
+                { session }
+            ),
+            Post.updateMany(
+                { srcUser: id },
+                { $set: { srcPostId: '', srcTimestamp: null, srcUser: '', desc: 'The post or user you shared from got deleted' } },
+                { session }
+            ),
+            Post.updateMany(
+                { shared: { $in: userPostIds } },
+                { $pull: { shared: { $in: userPostIds } } }, 
+                { session }
+            )
+        ]);
+
+        await Post.deleteMany({ userId: id }).session(session);
+
+        await User.updateMany(
+            { followings: id }, 
+            { $pull: { followings: id } },
+            { session }
+        );
+        
+
+        await User.deleteOne({ _id: id }).session(session);
+
+        await session.commitTransaction();
+        session.endSession();
+
+        res.status(200).send('User deleted successfully');
+
     } catch (err) {
         await session.abortTransaction();
-        res.status(500).json(err);
-    } finally {
         session.endSession();
+        res.status(400).send(err.message);
     }
 });
+
 
 //get a user
 router.get('/', async (req, res) => {
