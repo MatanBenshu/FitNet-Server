@@ -1,7 +1,6 @@
 import express from 'express';
 const router = express.Router();
 
-import Event from '../models/Event.js';
 import Post from '../models/Post.js';
 import Group from '../models/Group.js';
 import User from '../models/User.js';
@@ -25,7 +24,8 @@ router.put('/:id', async (req, res) => {
         const group = await Group.findById(req.params.id);
         if (group.Admin === req.body.Admin) {
             await group.updateOne({ $set: req.body });
-            res.status(200).json('the group has been updated');
+            const UpdatedGroup = await Group.findById(req.params.id);
+            res.status(200).json(UpdatedGroup);
         } else {
             res.status(403).json('only the admin can update the group');
         }
@@ -36,9 +36,9 @@ router.put('/:id', async (req, res) => {
 
 //get a group
 
-router.get('/:id', async (req, res) => {
+router.get('/:groupname', async (req, res) => {
     try {
-        const group = await Group.findById(req.params.id);
+        const group = await Group.findOne({groupname: req.params.groupname});
         res.status(200).json(group);
     } catch (err) {
         res.status(500).json(err);
@@ -54,20 +54,11 @@ router.get('/all/:userId', async (req, res) => {
 
         let friendsGroup = await Promise.all(
             user.followings.map((friendId) => {
-                return Group.find({followers:friendId});
+                return Group.find({Admin: friendId , followers: { $nin: req.params.userId}});
             }));   
         
         friendsGroup = friendsGroup.flat();
         
-        let recommendGroups=[];
-        friendsGroup.map(friendGroup => {
-            if (!adminGroups.includes(friendGroup ) && 
-                !followGroups.includes(friendGroup) &&
-                !recommendGroups.includes(friendGroup)) {
-                recommendGroups.push(friendGroup);
-            }
-        });
-
         let admin = [];
         adminGroups.map((group) => {
             admin.push(group.groupname);
@@ -77,9 +68,10 @@ router.get('/all/:userId', async (req, res) => {
             follow.push(group.groupname);
         });
         let recommend = [];
-        recommendGroups.map((group) => {
+        friendsGroup.map((group) => {
             recommend.push(group.groupname);
         });
+
         res.status(200).json({admin:admin,follow:follow,recommend:recommend});
     } catch (err) {
         res.status(500).json(err);
@@ -90,13 +82,9 @@ router.get('/all/:userId', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
     try {
-        const group = await Post.findById(req.params.id);
-        if (group.Admin=== req.body.Admin) {
-            await group.deleteOne();
-            res.status(200).json('the group has been deleted');
-        } else {
-            res.status(403).json('only admin can delete the group');
-        }
+        const group = await Group.findById(req.params.id);
+        await group.deleteOne();
+        res.status(200).json('the group has been deleted');
     } catch (err) {
         res.status(500).json(err);
     }
@@ -108,10 +96,8 @@ router.delete('/:id', async (req, res) => {
 
 router.get('/content/:id', async (req, res) => {
     try {
-        const group = await Group.findById(req.params.id);
-        const posts = await Post.find({ group: group._id });
-        const events = await Event.find({ group: group._id });
-        res.status(200).json(posts,events);
+        const posts = await Post.find({ group: req.params.id });
+        res.status(200).json(posts);
     } catch (err) {
         res.status(500).json(err);
     }
@@ -150,6 +136,38 @@ router.put('/join/:id', async (req, res) => {
         }
     } else {
         res.status(403).json('user already part of the group');
+    }
+});
+
+// a user join waiting list 
+
+router.put('/waiting/:id', async (req, res) => {
+    const group = await Group.findById(req.params.id);
+    if (!group.waiting.includes(req.body.userId)){
+        try {
+            await group.updateOne({ $push: { waiting: req.body.userId } });
+            res.status(200).json('the user joined to the wait list');
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    } else {
+        res.status(403).json('user already in the wait list');
+    }
+});
+
+// a user leave the wait list
+
+router.put('/unwaiting/:id', async (req, res) => {
+    const group = await Group.findById(req.params.id);
+    if (group.waiting.includes(req.body.userId)){
+        try {
+            await group.updateOne({ $pull: { waiting: req.body.userId } });
+            res.status(200).json('the user left the wait list');
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    } else {
+        res.status(403).json('user not in the wait list');
     }
 });
 

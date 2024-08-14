@@ -54,7 +54,6 @@ router.get('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-        console.log(post);
         if (post.shared.length > 0) {
             await Post.deleteMany({ _id: { $in: post.shared } })
                 .then(result => {
@@ -126,7 +125,8 @@ router.put('/:id/share', async (req, res) => {
             img: post.img,
             srcUser: post.userId,
             srcTimestamp: post.createdAt,
-            srcPostId: post._id
+            srcPostId: post._id,
+            group: post.group
         });
         const savedPost = await newPost.save();
         await post.updateOne({ $push: { shared: savedPost._id } });
@@ -144,10 +144,10 @@ router.put('/:id/share', async (req, res) => {
 router.get('/timeline/:userId', async (req, res) => {
     try {
         const currentUser = await User.findById(req.params.userId);
-        const userPosts = await Post.find({ userId: currentUser._id });
+        const userPosts = await Post.find({ userId: currentUser._id , group:''});
         const friendPosts = await Promise.all(
             currentUser.followings.map((friendId) => {
-                return Post.find({ userId: friendId });
+                return Post.find({ userId: friendId , group:''});
             })
         );
         res.status(200).json(userPosts.concat(...friendPosts));
@@ -162,7 +162,7 @@ router.get('/timeline/:userId', async (req, res) => {
 router.get('/profile/:username', async (req, res) => {
     try {
         const user = await User.findOne({ username: req.params.username });
-        const posts = await Post.find({ userId: user._id });
+        const posts = await Post.find({ userId: user._id , group:''});
         res.status(200).json(posts);
     } catch (err) {
         res.status(500).json(err);
@@ -175,7 +175,7 @@ router.get('/profile/:username', async (req, res) => {
 router.get('/likes/:username', async (req, res) => {
     try {
         const user = await User.findOne({ username: req.params.username });
-        const likedPosts = await Post.find({ likes: user._id });
+        const likedPosts = await Post.find({ likes: user._id.toString() , group:'' });
         res.status(200).json(likedPosts);
     } catch (err) {
         res.status(500).json(err);
@@ -188,7 +188,7 @@ router.get('/likes/:username', async (req, res) => {
 router.get('/saved/:username', async (req, res) => {
     try {
         const user = await User.findOne({ username: req.params.username });
-        const savedPosts = await Post.find({ savedBy: user._id });
+        const savedPosts = await Post.find({ savedBy: user._id.toString() , group:'' });
         res.status(200).json(savedPosts);
     } catch (err) {
         res.status(500).json(err);
