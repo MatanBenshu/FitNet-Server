@@ -7,9 +7,7 @@ import Event from '../models/Event.js';
 //create a event
 
 router.post('/', async (req, res) => {
-    console.log(req.body);
     const newEvent = new Event(req.body);
-    console.log(newEvent);
     try {
         const savedEvent = await newEvent.save();
         res.status(200).json(savedEvent);
@@ -17,15 +15,24 @@ router.post('/', async (req, res) => {
         res.status(500).json(err);
     }
 });
-
+// Route to get all events
+router.get('/all', async (req, res) => {
+    try {
+        const events = await Event.find({});
+        res.json(events);
+    } catch (error) {
+        res.status(500).send(error,'Server Error');
+    }
+});
 //update a event
 
-router.put('/:id', async (req, res) => {
+router.post('/update/:id', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id);
         if (event.userId === req.body.userId) {
-            await post.updateOne({ $set: req.body });
-            res.status(200).json('the event has been updated');
+            await event.updateOne({ $set: req.body });
+            const updatedEvent = await Event.findById(req.params.id);
+            res.status(200).json(updatedEvent);
         } else {
             res.status(403).json('you can update only your event');
         }
@@ -52,35 +59,14 @@ router.get('/all/:userId', async (req, res) => {
         const followEvents = await Event.find({ attendees: req.params.userId , userId: { $nin: req.params.userId } });
         const user = await User.findById(req.params.userId);
 
-        let friendsEvents = await Promise.all(
+        let recommendEvents = await Promise.all(
             user.followings.map((friendId) => {
-                return Event.find({attendees:friendId});
+                return Event.find({userId: { $in: friendId} ,attendees: { $nin: req.params.userId}});
             }));   
         
-        friendsEvents = friendsEvents.flat();
-        
-        let recommendEvents=[];
-        friendsEvents.map(event => {
-            if (!userEvents.includes(event ) && 
-                !followEvents.includes(event) &&
-                !recommendEvents.includes(event)) {
-                recommendEvents.push(event);
-            }
-        });
+        recommendEvents = recommendEvents.flat();
 
-        let own = [];
-        userEvents.map((event) => {
-            own.push(event.title);
-        });
-        let follow = [];
-        followEvents.map((event) => {
-            follow.push(event.title);
-        });
-        let recommend = [];
-        recommendEvents.map((event) => {
-            recommend.push(event.title);
-        });
-        res.status(200).json({own:own,follow:follow,recommend:recommend});
+        res.status(200).json({own:userEvents,follow:followEvents,recommend:recommendEvents});
     } catch (err) {
         res.status(500).json(err);
     }
@@ -91,12 +77,8 @@ router.get('/all/:userId', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id);
-        if (event.userId === req.body.userId) {
-            await event.deleteOne();
-            res.status(200).json('the event has been deleted');
-        } else {
-            res.status(403).json('you can delete only your event');
-        }
+        await event.deleteOne();
+        res.status(200).json('the event has been deleted');
     } catch (err) {
         res.status(500).json(err);
     }
